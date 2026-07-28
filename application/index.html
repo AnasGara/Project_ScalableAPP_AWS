@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Scalable Web Application on AWS</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="container">
+        <header class="header">
+            <h1>Scalable Web Application</h1>
+            <p>AWS Solutions Architect - Associate Graduation Project</p>
+            <span class="aws-badge">Powered by AWS</span>
+        </header>
+        
+        <main class="main-content">
+            <section class="card">
+                <h2>Instance Information</h2>
+                <div class="info-grid">
+                    <div class="info-item">
+                        <strong>Instance ID</strong>
+                        <span id="instance-id">Loading...</span>
+                    </div>
+                    <div class="info-item">
+                        <strong>Availability Zone</strong>
+                        <span id="az">Loading...</span>
+                    </div>
+                    <div class="info-item">
+                        <strong>Private IP</strong>
+                        <span id="private-ip">Loading...</span>
+                    </div>
+                    <div class="info-item">
+                        <strong>Hostname</strong>
+                        <span id="hostname">Loading...</span>
+                    </div>
+                </div>
+            </section>
+            
+            <section class="card">
+                <h2>AWS Services Used</h2>
+                <div class="services">
+                    <span class="service-tag">VPC</span>
+                    <span class="service-tag">EC2</span>
+                    <span class="service-tag">Auto Scaling</span>
+                    <span class="service-tag">ALB</span>
+                    <span class="service-tag">CloudFront</span>
+                    <span class="service-tag">RDS</span>
+                    <span class="service-tag">Route 53</span>
+                    <span class="service-tag">WAF</span>
+                    <span class="service-tag">CloudWatch</span>
+                    <span class="service-tag">Systems Manager</span>
+                </div>
+            </section>
+            
+            <section class="card">
+                <h2>Architecture Features</h2>
+                <ul class="features-list">
+                    <li>High Availability across 2 Availability Zones</li>
+                    <li>Auto Scaling with target tracking policies</li>
+                    <li>Application Load Balancer for traffic distribution</li>
+                    <li>CloudFront CDN for static asset caching</li>
+                    <li>WAF protection against OWASP Top 10</li>
+                    <li>Multi-AZ RDS for database redundancy</li>
+                    <li>Systems Manager Session Manager for secure access</li>
+                </ul>
+            </section>
+            
+            <section class="card">
+                <h2>Project Links</h2>
+                <div class="links">
+                    <a href="https://github.com/AnasGara/ScalableWebAPP_Project" class="link" target="_blank">
+                        GitHub Repository
+                    </a>
+                    <a href="health.html" class="link" target="_blank">
+                        Health Check
+                    </a>
+                    <a href="https://console.aws.amazon.com/cloudwatch/home" class="link" target="_blank">
+                        CloudWatch Dashboard
+                    </a>
+                </div>
+            </section>
+        </main>
+        
+        <footer class="footer">
+            <p>AWS Solutions Architect - Associate Graduation Project</p>
+            <p>Deployed with AWS CloudFormation</p>
+        </footer>
+    </div>
+    
+    <script>
+        // Fetch instance metadata
+        async function fetchInstanceInfo() {
+            try {
+                const tokenResponse = await fetch('http://169.254.169.254/latest/api/token', {
+                    method: 'PUT',
+                    headers: { 'X-aws-ec2-metadata-token-ttl-seconds': '21600' }
+                });
+                const token = await tokenResponse.text();
+                
+                const headers = { 'X-aws-ec2-metadata-token': token };
+                
+                const [instanceId, az, privateIp, hostname] = await Promise.all([
+                    fetch('http://169.254.169.254/latest/meta-data/instance-id', { headers }).then(r => r.text()),
+                    fetch('http://169.254.169.254/latest/meta-data/placement/availability-zone', { headers }).then(r => r.text()),
+                    fetch('http://169.254.169.254/latest/meta-data/local-ipv4', { headers }).then(r => r.text()),
+                    fetch('http://169.254.169.254/latest/meta-data/local-hostname', { headers }).then(r => r.text())
+                ]);
+                
+                document.getElementById('instance-id').textContent = instanceId;
+                document.getElementById('az').textContent = az;
+                document.getElementById('private-ip').textContent = privateIp;
+                document.getElementById('hostname').textContent = hostname;
+            } catch (error) {
+                console.error('Error fetching instance info:', error);
+                document.getElementById('instance-id').textContent = 'N/A';
+                document.getElementById('az').textContent = 'N/A';
+                document.getElementById('private-ip').textContent = 'N/A';
+                document.getElementById('hostname').textContent = 'N/A';
+            }
+        }
+        
+        fetchInstanceInfo();
+    </script>
+</body>
+</html>

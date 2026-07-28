@@ -1,0 +1,350 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: 'Monitoring Stack - CloudWatch Dashboards and Alarms'
+
+Parameters:
+  EnvironmentName:
+    Type: String
+    Default: 'scalable-webapp'
+  
+  AlertEmail:
+    Type: String
+    Description: Email address for alerts
+
+Resources:
+  # SNS Topic for Alerts
+  AlertSNSTopic:
+    Type: AWS::SNS::Topic
+    Properties:
+      TopicName: !Sub '${EnvironmentName}-alerts'
+      Subscription:
+        - Protocol: email
+          Endpoint: !Ref AlertEmail
+
+  # Email Subscription Confirmation
+  AlertSNSTopicPolicy:
+    Type: AWS::SNS::TopicPolicy
+    Properties:
+      Topics:
+        - !Ref AlertSNSTopic
+      PolicyDocument:
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: cloudwatch.amazonaws.com
+            Action: sns:Publish
+            Resource: !Ref AlertSNSTopic
+
+  # CloudWatch Dashboard
+  WebAppDashboard:
+    Type: AWS::CloudWatch::Dashboard
+    Properties:
+      DashboardName: !Sub '${EnvironmentName}-dashboard'
+      DashboardBody: !Sub |
+        {
+          "widgets": [
+            {
+              "type": "text",
+              "x": 0,
+              "y": 0,
+              "width": 24,
+              "height": 1,
+              "properties": {
+                "markdown": "# Scalable Web Application Dashboard"
+              }
+            },
+            {
+              "type": "metric",
+              "x": 0,
+              "y": 1,
+              "width": 8,
+              "height": 6,
+              "properties": {
+                "title": "ALB Request Count",
+                "metrics": [
+                  ["AWS/ApplicationELB", "RequestCount", "LoadBalancer", "${ALBFullName}"]
+                ],
+                "view": "timeSeries",
+                "stacked": false,
+                "region": "${AWS::Region}",
+                "period": 300
+              }
+            },
+            {
+              "type": "metric",
+              "x": 8,
+              "y": 1,
+              "width": 8,
+              "height": 6,
+              "properties": {
+                "title": "ALB Response Time",
+                "metrics": [
+                  ["AWS/ApplicationELB", "TargetResponseTime", "LoadBalancer", "${ALBFullName}"]
+                ],
+                "view": "timeSeries",
+                "stacked": false,
+                "region": "${AWS::Region}",
+                "period": 300
+              }
+            },
+            {
+              "type": "metric",
+              "x": 16,
+              "y": 1,
+              "width": 8,
+              "height": 6,
+              "properties": {
+                "title": "ALB Healthy Hosts",
+                "metrics": [
+                  ["AWS/ApplicationELB", "HealthyHostCount", "LoadBalancer", "${ALBFullName}", "TargetGroup", "${TargetGroupFullName}"]
+                ],
+                "view": "timeSeries",
+                "stacked": false,
+                "region": "${AWS::Region}",
+                "period": 300
+              }
+            },
+            {
+              "type": "metric",
+              "x": 0,
+              "y": 7,
+              "width": 8,
+              "height": 6,
+              "properties": {
+                "title": "EC2 CPU Utilization",
+                "metrics": [
+                  ["AWS/EC2", "CPUUtilization", "AutoScalingGroupName", "${ASGName}"]
+                ],
+                "view": "timeSeries",
+                "stacked": false,
+                "region": "${AWS::Region}",
+                "period": 300
+              }
+            },
+            {
+              "type": "metric",
+              "x": 8,
+              "y": 7,
+              "width": 8,
+              "height": 6,
+              "properties": {
+                "title": "EC2 Network In",
+                "metrics": [
+                  ["AWS/EC2", "NetworkIn", "AutoScalingGroupName", "${ASGName}"]
+                ],
+                "view": "timeSeries",
+                "stacked": false,
+                "region": "${AWS::Region}",
+                "period": 300
+              }
+            },
+            {
+              "type": "metric",
+              "x": 16,
+              "y": 7,
+              "width": 8,
+              "height": 6,
+              "properties": {
+                "title": "Auto Scaling Group Instances",
+                "metrics": [
+                  ["AWS/AutoScaling", "GroupDesiredCapacity", "AutoScalingGroupName", "${ASGName}"],
+                  ["AWS/AutoScaling", "GroupInServiceInstances", "AutoScalingGroupName", "${ASGName}"]
+                ],
+                "view": "timeSeries",
+                "stacked": false,
+                "region": "${AWS::Region}",
+                "period": 300
+              }
+            },
+            {
+              "type": "metric",
+              "x": 0,
+              "y": 13,
+              "width": 8,
+              "height": 6,
+              "properties": {
+                "title": "RDS CPU Utilization",
+                "metrics": [
+                  ["AWS/RDS", "CPUUtilization", "DBInstanceIdentifier", "${RDSInstanceIdentifier}"]
+                ],
+                "view": "timeSeries",
+                "stacked": false,
+                "region": "${AWS::Region}",
+                "period": 300
+              }
+            },
+            {
+              "type": "metric",
+              "x": 8,
+              "y": 13,
+              "width": 8,
+              "height": 6,
+              "properties": {
+                "title": "RDS Free Storage",
+                "metrics": [
+                  ["AWS/RDS", "FreeStorageSpace", "DBInstanceIdentifier", "${RDSInstanceIdentifier}"]
+                ],
+                "view": "timeSeries",
+                "stacked": false,
+                "region": "${AWS::Region}",
+                "period": 300
+              }
+            },
+            {
+              "type": "metric",
+              "x": 16,
+              "y": 13,
+              "width": 8,
+              "height": 6,
+              "properties": {
+                "title": "RDS Database Connections",
+                "metrics": [
+                  ["AWS/RDS", "DatabaseConnections", "DBInstanceIdentifier", "${RDSInstanceIdentifier}"]
+                ],
+                "view": "timeSeries",
+                "stacked": false,
+                "region": "${AWS::Region}",
+                "period": 300
+              }
+            }
+          ]
+        }
+
+  # CloudWatch Alarms
+  ALBHighResponseTimeAlarm:
+    Type: AWS::CloudWatch::Alarm
+    Properties:
+      AlarmName: !Sub '${EnvironmentName}-alb-high-response-time'
+      AlarmDescription: 'ALB response time is above 2 seconds'
+      MetricName: TargetResponseTime
+      Namespace: AWS/ApplicationELB
+      Statistic: Average
+      Period: 300
+      EvaluationPeriods: 2
+      Threshold: 2
+      ComparisonOperator: GreaterThanThreshold
+      Dimensions:
+        - Name: LoadBalancer
+          Value: !GetAtt ALBFullName.Value
+      AlarmActions:
+        - !Ref AlertSNSTopic
+
+  ALBHighHTTP5XXAlarm:
+    Type: AWS::CloudWatch::Alarm
+    Properties:
+      AlarmName: !Sub '${EnvironmentName}-alb-5xx-errors'
+      AlarmDescription: 'ALB 5XX errors are above threshold'
+      MetricName: HTTPCode_Target_5XX_Count
+      Namespace: AWS/ApplicationELB
+      Statistic: Sum
+      Period: 300
+      EvaluationPeriods: 1
+      Threshold: 100
+      ComparisonOperator: GreaterThanThreshold
+      Dimensions:
+        - Name: LoadBalancer
+          Value: !GetAtt ALBFullName.Value
+      AlarmActions:
+        - !Ref AlertSNSTopic
+      TreatMissingData: notBreaching
+
+  ALBUnhealthyHostAlarm:
+    Type: AWS::CloudWatch::Alarm
+    Properties:
+      AlarmName: !Sub '${EnvironmentName}-alb-unhealthy-hosts'
+      AlarmDescription: 'ALB has unhealthy hosts'
+      MetricName: UnHealthyHostCount
+      Namespace: AWS/ApplicationELB
+      Statistic: Average
+      Period: 300
+      EvaluationPeriods: 2
+      Threshold: 1
+      ComparisonOperator: GreaterThanOrEqualToThreshold
+      Dimensions:
+        - Name: LoadBalancer
+          Value: !GetAtt ALBFullName.Value
+        - Name: TargetGroup
+          Value: !GetAtt TargetGroupFullName.Value
+      AlarmActions:
+        - !Ref AlertSNSTopic
+
+  EC2HighCPUAlarm:
+    Type: AWS::CloudWatch::Alarm
+    Properties:
+      AlarmName: !Sub '${EnvironmentName}-ec2-high-cpu'
+      AlarmDescription: 'EC2 CPU utilization is above 80%'
+      MetricName: CPUUtilization
+      Namespace: AWS/EC2
+      Statistic: Average
+      Period: 300
+      EvaluationPeriods: 2
+      Threshold: 80
+      ComparisonOperator: GreaterThanThreshold
+      Dimensions:
+        - Name: AutoScalingGroupName
+          Value: !ImportValue '${EnvironmentName}-ASGName'
+      AlarmActions:
+        - !Ref AlertSNSTopic
+
+  ASGMaxCapacityAlarm:
+    Type: AWS::CloudWatch::Alarm
+    Properties:
+      AlarmName: !Sub '${EnvironmentName}-asg-max-capacity'
+      AlarmDescription: 'Auto Scaling Group is at maximum capacity'
+      MetricName: GroupDesiredCapacity
+      Namespace: AWS/AutoScaling
+      Statistic: Average
+      Period: 300
+      EvaluationPeriods: 2
+      Threshold: 10
+      ComparisonOperator: GreaterThanOrEqualToThreshold
+      Dimensions:
+        - Name: AutoScalingGroupName
+          Value: !ImportValue '${EnvironmentName}-ASGName'
+      AlarmActions:
+        - !Ref AlertSNSTopic
+
+  # CloudWatch Log Groups
+  WebAppLogGroup:
+    Type: AWS::Logs::LogGroup
+    Properties:
+      LogGroupName: !Sub '/aws/ec2/${EnvironmentName}'
+      RetentionInDays: 30
+
+  # CloudWatch Metric Filters
+  ErrorMetricFilter:
+    Type: AWS::Logs::MetricFilter
+    Properties:
+      LogGroupName: !Ref WebAppLogGroup
+      FilterPattern: '[timestamp, request_id, level="ERROR", message]'
+      MetricTransformations:
+        - MetricName: ErrorCount
+          MetricNamespace: Custom/Application
+          MetricValue: '1'
+          DefaultValue: 0
+
+  # CloudWatch Alarm for Errors
+  ApplicationErrorAlarm:
+    Type: AWS::CloudWatch::Alarm
+    Properties:
+      AlarmName: !Sub '${EnvironmentName}-app-errors'
+      AlarmDescription: 'Application errors detected in logs'
+      MetricName: ErrorCount
+      Namespace: Custom/Application
+      Statistic: Sum
+      Period: 300
+      EvaluationPeriods: 1
+      Threshold: 10
+      ComparisonOperator: GreaterThanThreshold
+      AlarmActions:
+        - !Ref AlertSNSTopic
+
+Outputs:
+  DashboardURL:
+    Description: CloudWatch Dashboard URL
+    Value: !Sub 'https://${AWS::Region}.console.aws.amazon.com/cloudwatch/home?region=${AWS::Region}#dashboards:name=${EnvironmentName}-dashboard'
+
+  AlertSNSTopicArn:
+    Description: SNS Topic ARN for alerts
+    Value: !Ref AlertSNSTopic
+    Export:
+      Name: !Sub '${EnvironmentName}-AlertSNSTopicArn'
