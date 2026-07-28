@@ -26,7 +26,7 @@ The implementation follows AWS Well-Architected Framework best practices, ensuri
 
 ## Solution Architecture Diagram
 
-![Solution Architecture](https://raw.githubusercontent.com/AnasGara/Project_ScalableAPP_AWS/main/Solution.png)
+![Solution Architecture](![https://raw.githubusercontent.com/AnasGara/Project_ScalableAPP_AWS/main/Solution.png](https://github.com/AnasGara/Project_ScalableAPP_AWS/blob/main/Solution.png))
 
 *Figure 1: High-level architecture of the Scalable Web Application with ALB and Auto Scaling*
 
