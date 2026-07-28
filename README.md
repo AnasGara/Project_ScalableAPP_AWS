@@ -1,6 +1,6 @@
 # Scalable Web Application with ALB and Auto Scaling
 
-**[AWS Solutions Implementation](https://aws.amazon.com/solutions/implementations/)** | **[🚧 Feature Request](https://github.com/anasgara/ScalableWebAPP_Project/issues/new?assignees=&labels=enhancement&template=feature_request.md&title=)** | **[🐛 Bug Report](https://github.com/anasgara/ScalableWebAPP_Project/issues/new?assignees=&labels=bug&template=bug_report.md&title=)** | **[❓ General Question](https://github.com/anasgara/ScalableWebAPP_Project/issues/new?assignees=&labels=question&template=general_question.md&title=)**
+**[AWS Solutions Implementation](https://aws.amazon.com/solutions/implementations/)** | **[🚧 Feature Request](https://github.com/AnasGara/Project_ScalableAPP_AWS/issues/new?assignees=&labels=enhancement&template=feature_request.md&title=)** | **[🐛 Bug Report](https://github.com/AnasGara/Project_ScalableAPP_AWS/issues/new?assignees=&labels=bug&template=bug_report.md&title=)** | **[❓ General Question](https://github.com/AnasGara/Project_ScalableAPP_AWS/issues/new?assignees=&labels=question&template=general_question.md&title=)**
 
 **Note**: This is a production-grade web application deployment on AWS using EC2 instances with a highly available and scalable architecture.
 
@@ -26,7 +26,7 @@ The implementation follows AWS Well-Architected Framework best practices, ensuri
 
 ## Solution Architecture Diagram
 
-![Solution Architecture](https://raw.githubusercontent.com/AnasGara/ScalableWebAPP_Project/main/Solution.png)
+![Solution Architecture](https://raw.githubusercontent.com/AnasGara/Project_ScalableAPP_AWS/main/Solution.png)
 
 *Figure 1: High-level architecture of the Scalable Web Application with ALB and Auto Scaling*
 
@@ -48,7 +48,7 @@ The solution integrates the following AWS services to build a robust, scalable, 
 ### 1. Clone the Repository
 
 ```bash
-git clone https://github.com/AnasGara/ScalableWebAPP_Project
+git clone https://github.com/AnasGara/Project_ScalableAPP_AWS
 cd ScalableWebAPP_Project
 export MAIN_DIRECTORY=$PWD
 ```

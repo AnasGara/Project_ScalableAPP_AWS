@@ -101,7 +101,7 @@ scalable-webapp-aws/
 ### Quick Start (Automated)
 ```bash
 # Clone repository
-git clone https://github.com/YOUR_USERNAME/scalable-webapp-aws.git
+git clone https://github.com/AnasGara/Project_ScalableAPP_AWS
 cd scalable-webapp-aws
 
 # Set environment variables

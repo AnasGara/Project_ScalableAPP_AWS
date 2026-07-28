@@ -11,7 +11,7 @@ Thank you for your interest in contributing to this project! This document provi
 3. Create a new branch for your feature or fix
 
 ```bash
-git clone https://github.com/YOUR_USERNAME/scalable-webapp-aws.git
+git clone https://github.com/AnasGara/Project_ScalableAPP_AWS
 cd scalable-webapp-aws
 git checkout -b feature/your-feature-name
 ```
