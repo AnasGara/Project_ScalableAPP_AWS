@@ -29,26 +29,7 @@ aws configure
 
 ## Quick Deployment
 
-### Option 1: Automated Deployment (Recommended)
-
-```bash
-# Clone the repository
-git clone https://github.com/AnasGara/Project_ScalableAPP_AWS
-cd scalable-webapp-aws
-
-# Set environment variables
-export AWS_REGION=us-east-1
-export ALERT_EMAIL=your-email@example.com
-export DB_PASSWORD=YourSecurePassword123!
-
-# Make scripts executable
-chmod +x scripts/*.sh
-
-# Deploy all stacks
-./scripts/deploy-all.sh
-```
-
-### Option 2: Manual Deployment
+### Manual Deployment
 
 #### Step 1: Deploy VPC Stack
 

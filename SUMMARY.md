@@ -28,17 +28,13 @@ scalable-webapp-aws/
 ├── .gitignore                         # Git ignore rules
 ├── architecture/
 │   ├── solution-architecture.drawio   # Editable diagram
-│   └── solution-architecture.txt      # Text-based diagram
+│   └── Solution.png                   # img diagram
 ├── cloudformation/
 │   ├── vpc-stack.yaml                 # VPC and networking
 │   ├── app-stack.yaml                 # EC2, ASG, ALB
 │   ├── rds-stack.yaml                 # RDS Multi-AZ
 │   ├── monitoring-stack.yaml          # CloudWatch + SNS
 │   └── cdn-dns-stack.yaml            # CloudFront + Route 53
-├── scripts/
-│   ├── deploy-all.sh                  # Deploy all stacks
-│   ├── destroy-all.sh                 # Clean up resources
-│   └── userdata.sh                    # EC2 initialization
 └── application/
     ├── index.html                     # Sample web page
     ├── health.html                    # Health check endpoint
@@ -109,9 +105,7 @@ export AWS_REGION=us-east-1
 export ALERT_EMAIL=your-email@example.com
 export DB_PASSWORD=YourSecurePassword123!
 
-# Deploy
-chmod +x scripts/*.sh
-./scripts/deploy-all.sh
+# Deploy all. GL
 ```
 
 ### Manual Deployment

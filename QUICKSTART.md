@@ -23,8 +23,7 @@ export DB_PASSWORD=YourSecurePassword123!
 
 ### Step 3: Deploy
 ```bash
-chmod +x scripts/*.sh
-./scripts/deploy-all.sh
+Do you magic. Sorry no automation yet.
 ```
 
 ### Step 4: Get Application URL
