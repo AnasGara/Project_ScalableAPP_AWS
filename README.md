@@ -62,7 +62,7 @@ bash
 aws configure
 ```
 # Enter your Access Key ID, Secret Access Key, Default region, and output format
-```
+
 ### 3. Deploy the Infrastructure
 ```
 bash
