@@ -2,27 +2,23 @@
 
 **[AWS Solutions Implementation](https://aws.amazon.com/solutions/implementations/)** | **[🚧 Feature Request](https://github.com/AnasGara/Project_ScalableAPP_AWS/issues/new?assignees=&labels=enhancement&template=feature_request.md&title=)** | **[🐛 Bug Report](https://github.com/AnasGara/Project_ScalableAPP_AWS/issues/new?assignees=&labels=bug&template=bug_report.md&title=)** | **[❓ General Question](https://github.com/AnasGara/Project_ScalableAPP_AWS/issues/new?assignees=&labels=question&template=general_question.md&title=)**
 
-**Note**: This is a production-grade web application deployment on AWS using EC2 instances with a highly available and scalable architecture.
+**Status:** Architecture study with a static application and CloudFormation templates. Deployment has not been verified. Start with the corrected [quick start](QUICKSTART.md) for a local preview and known infrastructure blockers.
 
 ## Table of Content
 
 - [Solution Overview](#solution-overview)
-- [Architecture Diagram](#architecture-diagram)
+- [Architecture Diagram](#solution-architecture-diagram)
 - [Key AWS Services](#key-aws-services)
-- [Prerequisites for Deployment](#prerequisites-for-deployment)
-  - [1. Clone the Repository](#1-clone-the-repository)
-  - [2. Configure AWS CLI](#2-configure-aws-cli)
-  - [3. Deploy the Infrastructure](#3-deploy-the-infrastructure)
-  - [4. Testing and Validation](#4-testing-and-validation)
+- [Getting started](#getting-started)
 - [Security Considerations](#security-considerations)
 - [Monitoring and Alerts](#monitoring-and-alerts)
 - [License](#license)
 
 ## Solution Overview
 
-This solution deploys a production-grade web application on AWS using EC2 instances inside a properly architected VPC with public and private subnets across two Availability Zones. The architecture achieves high availability and scalability with Application Load Balancer (ALB), Auto Scaling Group (ASG), and CloudFront distribution for caching static assets. A Multi-AZ RDS instance serves as the database backend, with all compute resources placed in private subnets for enhanced security.
+The intended architecture describes a web application on AWS using EC2 instances inside a properly architected VPC with public and private subnets across two Availability Zones. The architecture achieves high availability and scalability with Application Load Balancer (ALB), Auto Scaling Group (ASG), and CloudFront distribution for caching static assets. A Multi-AZ RDS instance serves as the database backend, with all compute resources placed in private subnets for enhanced security.
 
-The implementation follows AWS Well-Architected Framework best practices, ensuring security, reliability, performance efficiency, cost optimization, and operational excellence. By leveraging AWS Systems Manager Session Manager, the solution eliminates the need for bastion hosts, providing secure instance access without exposing SSH ports to the internet.
+The design targets AWS Well-Architected Framework principles, ensuring security, reliability, performance efficiency, cost optimization, and operational excellence. By leveraging AWS Systems Manager Session Manager, the solution eliminates the need for bastion hosts, providing secure instance access without exposing SSH ports to the internet.
 
 ## Solution Architecture Diagram
 
@@ -43,75 +39,18 @@ The solution integrates the following AWS services to build a robust, scalable, 
 - **Systems Manager**: Session Manager for secure instance access without bastion hosts
 - **CloudWatch + SNS**: Comprehensive monitoring with dashboards, alarms, and notification system
 
-## Prerequisites for Deployment
+## Getting started
 
-### 1. Clone the Repository
+See [QUICKSTART.md](QUICKSTART.md) for a local static preview and an infrastructure
+review checklist. The repository uses CloudFormation templates in `cloudformation/`;
+the former CDK instructions referenced files that do not exist.
 
-```bash
-git clone https://github.com/AnasGara/Project_ScalableAPP_AWS
-cd ScalableWebAPP_Project
-export MAIN_DIRECTORY=$PWD
-```
-### 2. Configure AWS CLI
+The service list above describes the intended architecture. It is not evidence of
+a live deployment, measured availability, or completed security acceptance.
 
-Ensure you have AWS CLI installed and configured with appropriate credentials:
-
-bash
-
-```
-aws configure
-```
-# Enter your Access Key ID, Secret Access Key, Default region, and output format
-
-### 3. Deploy the Infrastructure
-```
-bash
-
-cd $MAIN_DIRECTORY/infrastructure
-npm install
-npm run build
-```
-
-# Bootstrap CDK (if not already done)
-npx cdk bootstrap --profile <PROFILE_NAME>
-# Deploy the stack
-```
-
-npx cdk deploy WebAppStack \
-  --parameters VpcCIDR=10.0.0.0/16 \
-  --parameters KeyPairName=<YOUR_KEY_PAIR> \
-  --parameters DBUsername=<DB_USERNAME> \
-  --parameters DBPassword=<DB_PASSWORD> \
-  --profile <PROFILE_NAME>
-```
-
-_Note:_
-
-- **PROFILE_NAME**: Name of an AWS CLI profile with appropriate permissions
-    
-- **KeyPairName**: Existing EC2 Key Pair for instance access
-    
-- **DBUsername**: Master username for RDS database
-    
-- **DBPassword**: Master password for RDS database (minimum 8 characters)
-    
-
-### 4. Testing and Validation
-
-After deployment, validate your infrastructure:
-```
-bash
-
-# Get the CloudFront distribution URL
-aws cloudfront list-distributions --profile <PROFILE_NAME> | grep DomainName
-# Test the application endpoint
-curl -I https://<cloudfront-domain>/health
-# Verify Auto Scaling group status
-aws autoscaling describe-auto-scaling-groups --profile <PROFILE_NAME> | grep DesiredCapacity
-```
 ## Security Considerations
 
-This solution implements multiple layers of security:
+Security controls to verify before deployment:
 
 - **Network Security**: All compute resources are deployed in private subnets
     
@@ -128,7 +67,7 @@ This solution implements multiple layers of security:
 
 ## Monitoring and Alerts
 
-The solution includes comprehensive monitoring capabilities:
+Monitoring capabilities described by the architecture:
 
 - **CloudWatch Dashboards**: Visual representation of key metrics
     
@@ -150,5 +89,4 @@ SPDX-License-Identifier: Apache-2.0
 
 ## Contributing
 
-We welcome contributions! Please see our [Contributing Guidelines](https://contributing.md/) for more information on how to submit pull requests, report bugs, or request features.
-
+We welcome contributions! Please see our [Contributing Guidelines](CONTRIBUTING.md) for more information on how to submit pull requests, report bugs, or request features.
