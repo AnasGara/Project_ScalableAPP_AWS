@@ -1,79 +1,34 @@
-# Quick Start Guide - Scalable Web Application on AWS
+# Quick start: inspect before deploying
 
-## Prerequisites
+This repository contains a static sample application and AWS CloudFormation templates.
+It does not contain a CDK application or the previously referenced deploy/destroy scripts.
+The templates require review and account-specific configuration before deployment.
 
-- AWS Account with admin access
-- AWS CLI installed and configured
-- Git installed
-
-## 5-Minute Deployment
-
-### Step 1: Clone and Navigate
-```bash
-git clone https://github.com/AnasGara/Project_ScalableAPP_AWS
-cd scalable-webapp-aws
+```sh
+git clone https://github.com/AnasGara/Project_ScalableAPP_AWS.git
+cd Project_ScalableAPP_AWS
+python -m http.server 8000 --bind 127.0.0.1 --directory application
 ```
 
-### Step 2: Set Variables
-```bash
-export AWS_REGION=us-east-1
-export ALERT_EMAIL=your-email@example.com
-export DB_PASSWORD=YourSecurePassword123!
-```
+Open [the sample application](http://localhost:8000). This serves static files locally;
+it does not provision AWS resources or test AWS integration. Stop with Ctrl+C.
 
-### Step 3: Deploy
-```bash
-Do you magic. Sorry no automation yet.
-```
+## Infrastructure review
 
-### Step 4: Get Application URL
-```bash
-ALB_DNS=$(aws cloudformation describe-stacks \
-  --stack-name scalable-webapp-app \
-  --query 'Stacks[0].Outputs[?OutputKey==`ALBDNSName`].OutputValue' \
-  --output text \
-  --region $AWS_REGION)
+The templates are under `cloudformation/`: VPC, application, RDS, CDN/DNS, and monitoring.
+Start with the network and inspect exported values and cross-stack imports before
+creating any stack. Several imports currently contain literal `${...}` expressions
+without `Fn::Sub`; the templates must be corrected and linted before deployment.
+The RDS security group also needs review of its imported source security group.
 
-echo "Application URL: http://$ALB_DNS"
-```
-
-### Step 5: Open in Browser
-Copy the URL and open in your browser!
-
----
-
-## What Gets Deployed
-
-| Resource | Description |
-|----------|-------------|
-| VPC | Network with 6 subnets across 2 AZs |
-| EC2 | 2 web servers in private subnets |
-| ALB | Load balancer distributing traffic |
-| RDS | Multi-AZ database |
-| CloudFront | CDN for static assets |
-| WAF | Web application firewall |
-| CloudWatch | Monitoring dashboard |
-
----
-
-## Cost
-
-**Estimated Monthly Cost**: ~$198 USD (US East-1)
-
-> New AWS accounts may qualify for free tier benefits.
-
----
+Use [DEPLOYMENT.md](DEPLOYMENT.md) as design notes, not a verified end-to-end procedure.
+Review template parameters, region-specific AMIs, IAM permissions, certificates, DNS,
+database secret handling, and deletion policies. Validate templates with `cfn-lint`
+and inspect change sets before execution. No deployment or cost estimate is verified here.
 
 ## Cleanup
 
-```bash
-./scripts/destroy-all.sh
-```
-
----
-
-## Need Help?
-
-- Read `DEPLOYMENT.md` for detailed instructions
-- Check `README.md` for full documentation
-- Review AWS CloudFormation events for errors
+There is no `scripts/destroy-all.sh`. If you have deployed stacks, inspect dependencies,
+retained resources, database backups, and data-retention requirements before deleting
+them in reverse dependency order through CloudFormation. Stopping this local preview
+does not remove any AWS resources.
